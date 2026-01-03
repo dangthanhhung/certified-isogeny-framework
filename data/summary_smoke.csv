@@ -1,0 +1,2 @@
+Scenario,Prime,N_Total,Success_Count,Success_Rate,Median_Time_ms,Top_Fail
+SMOKE,65537,20000,20000,100.00,1022.27,None
