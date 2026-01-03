@@ -2,7 +2,7 @@
 Reference implementation for the paper 'A Certified Framework for Deterministic Navigation in Higher-Genus p-Isogeny Graphs'. Includes PICS algorithm, ND certificate, and C/FLINT benchmarks.
 
 **Author:** Hung T. Dang  
-**Submission to:** Journal of Cryptology (2025)
+**Submission to:** Journal of Cryptology (2026)
 
 ## Overview
 
