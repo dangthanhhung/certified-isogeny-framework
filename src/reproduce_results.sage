@@ -3,7 +3,7 @@ from sage.all import *
 from sage.schemes.hyperelliptic_curves.hypellfrob import hypellfrob
 
 # =============================================================================
-# CÔNG CỤ TÁI LẬP (REPRODUCER) - BẢN FINAL
+# REPRODUCER - FINAL VERSION
 # =============================================================================
 def reproduce_single_case(p, seed):
     print(f"\n{'='*70}")
@@ -27,7 +27,7 @@ def reproduce_single_case(p, seed):
     print(f"\n[2] HASSE-WITT RANK COMPUTATION")
     rank_final = -1
     
-    # --- A. Chiến thuật cho P nhỏ (Toy/Smoke): Dùng Oracle Naive ---
+    # --- A. Tactics for small P (Toy/Smoke): Use Naive Oracle ---
     if p < 100000:
         print("    Method: Oracle Naive Powering (Exact for small p)")
         exponent = (p - 1) // 2
@@ -44,7 +44,7 @@ def reproduce_single_case(p, seed):
         print(f"    HW Matrix:\n{H.str()}")
         print(f"    -> RANK: {rank_final}")
         
-    # --- B. Chiến thuật cho P lớn (31/40 bit): Dùng Hypellfrob ---
+    # --- B. Strategy for large P (31/40 bits): Use Hypellfrob ---
     else:
         print("    Method: Hypellfrob N=5 + CharPoly (High Performance)")
         try:
@@ -54,7 +54,7 @@ def reproduce_single_case(p, seed):
             M_padic = hypellfrob(p, 5, f_z)
             M = Matrix(GF(p), 4, 4, [GF(p)(v) for row in M_padic for v in row])
             
-            # Dùng CharPoly (Bất biến)
+            # Use CharPoly (Invariant)
             poly = M.charpoly()
             coeffs_cp = poly.list() # [a0, a1, a2, a3, a4]
             a2 = coeffs_cp[2]
@@ -95,7 +95,7 @@ def reproduce_single_case(p, seed):
             print(f"\n[5] KERNEL POLYNOMIAL S(x)")
             print(f"    S(x) = {S_x}")
             
-            # --- PHẦN DỰNG ẢNH C' (BẠN YÊU CẦU) ---
+            # --- CONSTRUCT IMAGE C' ---
             print(f"\n[6] CONSTRUCTING IMAGE CURVE C'")
             if defect == 0: # Ordinary
                 print("    Type: Frobenius Isogeny")
