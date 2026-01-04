@@ -3,22 +3,19 @@ from multiprocessing import cpu_count
 from sage.all import *
 from sage.schemes.hyperelliptic_curves.hypellfrob import hypellfrob
 
-# RAM an toàn cho 1 process (Khi chạy Parallel OS)
-# 2GB là đủ cho N=1
+# RAM is safe for 1 process (When running Parallel OS)
+# 2GB is enough for N=1
 PARI_STACK_PER_WORKER = 2 * 1024 * 1024 * 1024 
 
 SCENARIOS = {
-    # Nâng cấp Toy lên 20k
+    # Upgrade Toy to 20k
     "toy":   {"p": 1031, "N": 20000, "check_oracle": True, "desc": "Verification (High Coverage)"},
     
-    # Nâng cấp Smoke lên 20k
+    # Upgrade Smoke to 20k
     "smoke": {"p": 65537, "N": 20000, "check_oracle": True, "desc": "Stability Check"},
     
-    # Giữ nguyên 31-bit
-    "31bit": {"p": 2147483647, "N": 20000, "check_oracle": False, "desc": "Production Benchmark"},
-    
-    # Bỏ 40-bit (như đã chốt)
-    "40bit": {"p": 1099511627791, "N": 20000, "check_oracle": False, "desc": "Production"}
+    # 31-bit
+    "31bit": {"p": 2147483647, "N": 20000, "check_oracle": False, "desc": "Production Benchmark"}
 }
 
 def sage_to_python(obj):
@@ -27,15 +24,15 @@ def sage_to_python(obj):
     if isinstance(obj, (int, float, str, bool, type(None))): return obj
     return str(obj)
 
-# --- BACKEND QUAN TRỌNG (N=1 CHO TỐC ĐỘ) ---
+# --- IMPORTANT BACKEND (N=1 FOR SPEED) ---
 def get_rank_hypellfrob_detailed(f, p):
     try:
         R_Z = PolynomialRing(ZZ, 'x')
         f_z = R_Z(f.list())
         
-        # --- CẤU HÌNH CHO 31-BIT ---
-        # N=1: Nhanh nhất (1.7s/curve). Đủ chính xác cho rank.
-        # N=5: Quá chậm (144s/curve). Không dùng cho 31bit.
+        # --- 31-BIT CONFIGURATION---
+        # N=1: Fastest (1.7s/curve). Accurate enough for ranking.
+        # N=5: Too slow (144s/curve). Not suitable for 31-bit.
         PRECISION = 5 
         
         M_padic = hypellfrob(p, PRECISION, f_z)
@@ -114,7 +111,7 @@ def run_batch_mode(mode, start_seed, count, worker_id):
         for i in range(count):
             res = run_step(start_seed + i, p, conf["check_oracle"])
             f.write(json.dumps(sage_to_python(res)) + "\n")
-            f.flush() # Quan trọng để không bị treo log
+            f.flush() # It's important to avoid getting your log stuck.
     print(f"[Worker {worker_id}] Done.")
 
 def regenerate_report(mode):
