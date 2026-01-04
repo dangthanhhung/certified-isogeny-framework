@@ -1,15 +1,15 @@
 import json
 from sage.all import *
 
-# Cấu hình
-JSONL_FILE = "official_toy.jsonl" # File vừa sinh ra
+# Configuration
+JSONL_FILE = "official_toy.jsonl" 
 P_TOY = 1031
 
 def get_oracle_rank_primitive(f, p):
-    """Chân lý tuyệt đối (Naive Powering)"""
+    """ Naive Powering """
     try:
         N = (p - 1) // 2
-        # Tính f^N trong vành đa thức Sage
+        # Calculate f^N in the Sage polynomial ring.
         h = f**N
         c = h.list()
         while len(c) <= 2*p: c.append(0)
@@ -37,7 +37,7 @@ def check_results():
             total += 1
             data = json.loads(line)
             
-            # 1. Tái tạo Curve từ Seed
+            #1. Recreate the Curve from Seed
             seed_val = int(data['seed'])
             set_random_seed(seed_val)
             coeffs = [F.random_element() for _ in range(5)]
@@ -47,22 +47,20 @@ def check_results():
                 skipped += 1
                 continue
 
-            # 2. Lấy Rank từ file (Hypellfrob CharPoly)
-            # Cấu trúc file mới: data['timings_ms']['pics']... 
-            # Rank nằm trong meta->hw->rank (nếu bạn lưu)
-            # Nhưng file joc_report_gen không lưu rank ra ngoài cùng.
-            # Ta phải chạy lại Hypellfrob ở đây để test? KHÔNG.
+            # 2. Get Rank from file (Hypellfrob CharPoly)
+            # New file structure: data['timings_ms']['pics']... 
+            # Rank is in meta->hw->rank (nếu bạn lưu)
             
-            # Kiểm tra status
+            # Check status
             status = data.get('status')
             
-            # Tính Oracle
+            # Compute Oracle
             rank_oracle = get_oracle_rank_primitive(f_poly, P_TOY)
             
             # Logic check:
-            # Nếu Status = SUCCESS => Rank file = 2 (Ordinary)
-            # Nếu Fail Reason chứa "defect=1" => Rank file = 1
-            # Nếu Fail Reason chứa "defect=2" => Rank file = 0
+            # If Status = SUCCESS => Rank file = 2 (Ordinary)
+            # If Fail Reason contains "defect=1" => Rank file = 1
+            # If Fail Reason contains "defect=2" => Rank file = 0
             
             rank_file = -1
             if status == "SUCCESS":
@@ -73,12 +71,12 @@ def check_results():
                 elif "defect=2" in reason: rank_file = 0
                 elif "defect=0" in reason: rank_file = 2 # Hiếm gặp (lỗi khác)
             
-            # Nếu rank_file không xác định được (do lỗi crash hệ thống), bỏ qua
+            # If rank_file is unknown (due to a system crash), ignore it.
             if rank_file == -1:
                 print(f"[?] Skip seed {seed_val}: Cannot determine rank from log.")
                 continue
 
-            # 4. So sánh
+            # 4. Compare
             if rank_file == rank_oracle:
                 matches += 1
             else:
@@ -94,9 +92,9 @@ def check_results():
     print(f"MISMATCHES:    {mismatches}")
     
     if mismatches == 0:
-        print("\n>>> KẾT QUẢ TUYỆT ĐỐI! HYPELLFROB (CharPoly) ĐÃ KHỚP ORACLE. <<<")
+        print("\n>>> PERFECT RESULT! HYPELLFROB (CharPoly) HAS MATCHED THE ORACLE. <<<")
     else:
-        print("\n>>> VẪN CÒN LỖI <<<")
+        print("\n>>> STILL HAS ERROR <<<")
 
 if __name__ == "__main__":
     check_results()
